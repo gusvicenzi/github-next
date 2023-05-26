@@ -1,37 +1,43 @@
 'use client'
+import styles from './page.module.sass'
 
-import UserListItem from '@/components/UserListItem'
-import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { getUsersPage } from '../../utils/axios'
 
-export default async function Users() {
-  const [page, setPage] = useState(0)
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { UserListItem } from '@/components/UserListItem'
 
-  async function getUsers(page: number = 0) {
-    console.log(process.env.GITHUB_API_KEY)
-
-    const usersData = await fetch(
-      `https://api.github.com/users?per_page=${10}&since=${page * 10}`,
-      {
-        headers: {
-          Authorization: `Bearer ${'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'}`
-        }
-      }
-    )
-    const users: GHUser[] = await usersData.json()
-    return users
-  }
-
-  const { data, isLoading, isFetching, error } = useQuery({
-    queryKey: ['users', page],
-    queryFn: () => getUsers()
+export default function UsersInfiniteScroll() {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+    error
+  } = useInfiniteQuery<GHUser[]>({
+    queryKey: ['users'],
+    queryFn: ({ pageParam }) => getUsersPage(pageParam),
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length ? allPages.length + 1 : undefined
+    }
   })
 
+  if (status === 'error')
+    return <p>Error: {error instanceof Error ? error?.message : ''}</p>
+
+  const content = data?.pages.map(pg => {
+    return pg.map((user, i) => <UserListItem user={user} key={user.id} />)
+  })
   return (
-    <div>
-      {data?.map(user => (
-        <UserListItem user={user} key={user.id} />
-      ))}
-    </div>
+    <InfiniteScroll
+      className={styles.container}
+      dataLength={data?.pages.length || 0}
+      next={fetchNextPage}
+      hasMore={hasNextPage || false}
+      loader={<p className={styles.loadingText}>Loading users...</p>}
+      endMessage={<h4>Nothing more to show</h4>}>
+      {content}
+    </InfiniteScroll>
   )
 }
