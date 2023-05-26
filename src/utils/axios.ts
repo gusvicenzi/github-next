@@ -3,8 +3,8 @@ import axios from 'axios'
 
 export const getUsersPage = async (page: number = 1, options = {}) => {
   const resp = await axios.get(
-    `https://api.github.com/users?per_page=${10}&since=${
-      page !== 1 ? page * 10 : 0
+    `https://api.github.com/users?per_page=${100}&since=${
+      page !== 1 ? page * 100 : 0
     }`,
     {
       headers: {

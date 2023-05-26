@@ -20,7 +20,9 @@ export default function UsersInfiniteScroll() {
     queryFn: ({ pageParam }) => getUsersPage(pageParam),
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length ? allPages.length + 1 : undefined
-    }
+    },
+    refetchOnWindowFocus: false,
+    staleTime: Infinity
   })
 
   if (status === 'error')
@@ -32,9 +34,9 @@ export default function UsersInfiniteScroll() {
   return (
     <InfiniteScroll
       className={styles.container}
-      dataLength={data?.pages.length || 0}
+      dataLength={data?.pages.length || 10}
       next={fetchNextPage}
-      hasMore={hasNextPage || false}
+      hasMore={hasNextPage || true}
       loader={<p className={styles.loadingText}>Loading users...</p>}
       endMessage={<h4>Nothing more to show</h4>}>
       {content}
