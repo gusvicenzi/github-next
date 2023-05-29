@@ -14,7 +14,9 @@ type Props = {
 export default function UserPage({ params: { username } }: Props) {
   const { data: userInfo, isLoading } = useQuery({
     queryKey: ['userInfo', username],
-    queryFn: async () => await getUserByUsername(username)
+    queryFn: async () => await getUserByUsername(username),
+    refetchOnWindowFocus: false,
+    retry: 2
   })
 
   if (isLoading)
@@ -33,8 +35,8 @@ export default function UserPage({ params: { username } }: Props) {
 
   return (
     <div className={styles.container}>
-      <h3>{userInfo.id}</h3>
-      <Link href={userInfo.html_url} target='_blank'>
+      <h3>id: {userInfo.id}</h3>
+      <Link href={userInfo.html_url} target='_blank' className={styles.links}>
         {/* <Image
         src='https://avatars.githubusercontent.com/u/87548627?v=4'
         width='128'
@@ -46,13 +48,14 @@ export default function UserPage({ params: { username } }: Props) {
           src={userInfo.avatar_url}
           alt={`${userInfo.login} profile picture`}
         />
+        <h1>{userInfo.login}</h1>
       </Link>
-      <h1>{userInfo.login}</h1>
-      <div>
-        <Link href={userInfo.repos_url}>
+
+      <div className={styles.subMenu}>
+        <Link href={userInfo.repos_url} className={styles.links}>
           <p>Seguidores</p>
         </Link>
-        <Link href={userInfo.repos_url}>
+        <Link href={userInfo.repos_url} className={styles.links}>
           <p>Repositórios</p>
         </Link>
       </div>
