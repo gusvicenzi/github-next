@@ -1,8 +1,10 @@
 'use client'
-import { getUserByUsername } from '@/utils/axios'
+import { getUserByUsername, getUserRepos } from '@/utils/axios'
 import { useQuery } from '@tanstack/react-query'
 import styles from './page.module.sass'
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { UserRepos } from '@/components/UserRepos'
 // import Image from 'next/image'
 
 type Props = {
@@ -16,6 +18,13 @@ export default function UserPage({ params: { username } }: Props) {
     queryKey: ['userInfo', username],
     queryFn: async () => await getUserByUsername(username),
     refetchOnWindowFocus: false,
+    retry: 2
+  })
+
+  const { data: userRepos, isLoading: isLoadingUserRepos } = useQuery({
+    queryKey: ['userRepos', username],
+    queryFn: async () => await getUserRepos(username),
+    refetchOnWindowFocus: true,
     retry: 2
   })
 
@@ -55,10 +64,13 @@ export default function UserPage({ params: { username } }: Props) {
         <Link href={userInfo.repos_url} className={styles.links}>
           <p>Seguidores</p>
         </Link>
-        <Link href={userInfo.repos_url} className={styles.links}>
+        {/* <Link href={`users/${userInfo.login}/repos`} className={styles.links}>
           <p>Repositórios</p>
-        </Link>
+        </Link> */}
       </div>
+
+      <div className={styles.reposContainer}></div>
+      <Suspense>{userRepos && <UserRepos repos={userRepos} />}</Suspense>
     </div>
   )
 }
