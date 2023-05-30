@@ -11,7 +11,7 @@ export function UserRepos({ repos }: Props) {
       {repos.map(repo => {
         return (
           <div key={repo.id}>
-            <Link href={repo.html_url} target='_blank'>
+            <Link href={repo.html_url} target='_blank' className={styles.link}>
               <h2>{repo.name}</h2>
             </Link>
           </div>
