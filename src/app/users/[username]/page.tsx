@@ -70,7 +70,9 @@ export default function UserPage({ params: { username } }: Props) {
       </div>
 
       <div className={styles.reposContainer}></div>
-      <Suspense>{userRepos && <UserRepos repos={userRepos} />}</Suspense>
+      <Suspense fallback={<h2>Loading repos...</h2>}>
+        {userRepos && <UserRepos repos={userRepos} />}
+      </Suspense>
     </div>
   )
 }
